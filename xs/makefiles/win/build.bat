@@ -18,9 +18,12 @@ REM   You should have received a copy of the GNU General Public License
 REM   along with the Moddable SDK Tools.  If not, see <http://www.gnu.org/licenses/>.
 REM
 REM
+SET MODDABLE=%~dp0\..\..\..
+CALL "%VS140COMNTOOLS%vsvars32.bat"
 SET BUILD_DIR=%MODDABLE%\build
 SET XS_DIR=%MODDABLE%\xs
+SET VC_INCLUDE=%INCLUDE%
 @echo on
 
-nmake GOAL=debug BUILD_DIR=%BUILD_DIR% XS_DIR=%XS_DIR% /c /f xst.mak /s
-nmake GOAL=release BUILD_DIR=%BUILD_DIR% XS_DIR=%XS_DIR% /c /f xst.mak /s
+nmake GOAL=debug BUILD_DIR=%BUILD_DIR% XS_DIR=%XS_DIR% VC_INCLUDE="%VC_INCLUDE%" /c /f xst.mak /s
+nmake GOAL=release BUILD_DIR=%BUILD_DIR% XS_DIR=%XS_DIR% VC_INCLUDE="%VC_INCLUDE%" /c /f xst.mak /s

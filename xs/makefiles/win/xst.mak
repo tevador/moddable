@@ -55,6 +55,7 @@ C_OPTIONS = \
 	/I$(SRC_DIR) \
 	/I$(TLS_DIR) \
 	/I$(TLS_DIR)\yaml \
+	/I$(VC_INCLUDE) \
 	/nologo \
 	/Zp1 
 !IF "$(GOAL)"=="debug"
