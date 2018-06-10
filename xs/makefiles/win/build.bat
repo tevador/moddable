@@ -19,7 +19,7 @@ REM   along with the Moddable SDK Tools.  If not, see <http://www.gnu.org/licens
 REM
 REM
 SET MODDABLE=%~dp0\..\..\..
-CALL "%VS140COMNTOOLS%vsvars32.bat"
+CALL "%VS140COMNTOOLS%\..\..\VC\vcvarsall.bat" amd64
 SET BUILD_DIR=%MODDABLE%\build
 SET XS_DIR=%MODDABLE%\xs
 SET VC_INCLUDE=%INCLUDE%
