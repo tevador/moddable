@@ -2742,7 +2742,7 @@ XS_CODE_JUMP:
 			mxBreak;
 		mxCase(XS_CODE_MODULO)
 			slot = mxStack + 1;
-			if ((slot->kind == XS_INTEGER_KIND) && (mxStack->kind == XS_INTEGER_KIND) && (mxStack->value.integer != 0)) {
+			if ((slot->kind == XS_INTEGER_KIND) && (mxStack->kind == XS_INTEGER_KIND) && (mxStack->value.integer != 0) && (slot->value.integer >= 0)) {
 				slot->value.integer %= mxStack->value.integer;
 			} 
 			else {
