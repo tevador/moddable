@@ -26,8 +26,8 @@ ifneq ($(VERBOSE),1)
 MAKEFLAGS += --silent
 endif
 
-XS_DIR ?= $(realpath ../..)
-BUILD_DIR ?= $(realpath ../../../build)
+XS_DIR = $(realpath ../..)
+BUILD_DIR = $(realpath ../../../build)
 
 BIN_DIR = $(BUILD_DIR)/bin/lin/$(GOAL)
 INC_DIR = $(XS_DIR)/includes
