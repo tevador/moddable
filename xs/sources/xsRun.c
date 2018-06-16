@@ -2662,13 +2662,25 @@ XS_CODE_JUMP:
 			if (slot->kind == mxStack->kind) {
 				if (slot->kind == XS_INTEGER_KIND) {
 					#if __has_builtin(__builtin_sub_overflow)
+						txInteger originalValue = slot->value.integer;
 						if (__builtin_sub_overflow(slot->value.integer, mxStack->value.integer, &slot->value.integer)) {
+							slot->value.integer = originalValue;
 							fxToNumber(the, slot);
 							fxToNumber(the, mxStack);
 							slot->value.number -= mxStack->value.number;
 						}
 					#else
-						slot->value.integer -= mxStack->value.integer; // @@ overflow?
+						txInteger a = slot->value.integer;
+						txInteger b = mxStack->value.integer;
+						txInteger c = a - b;
+						if ((c < a) != (b > 0)) { //check for overflow
+							fxToNumber(the, slot);
+							fxToNumber(the, mxStack);
+							slot->value.number -= mxStack->value.number;
+						}
+						else {
+							slot->value.integer = c;
+						}
 					#endif
 				}
 				else if (slot->kind == XS_NUMBER_KIND)
