@@ -849,6 +849,11 @@ again:
 		fxStringifyJSONName(the, theStringifier, theFlag);
 		fxStringifyJSONString(the, theStringifier, aValue->value.string);
 		break;
+	case XS_REGEXP_KIND:
+		fxStringifyJSONName(the, theStringifier, theFlag);
+		fxStringifyJSONChar(the, theStringifier, '{');
+		fxStringifyJSONChar(the, theStringifier, '}');
+		break;
 	case XS_REFERENCE_KIND:
 		anInstance = fxGetInstance(the, aValue);
 		aValue = anInstance->next;
