@@ -47,7 +47,7 @@
 #define NO_BF96
 #define NO_HEX_FP
 #define Omit_Private_Memory
-#define ROUND_BIASED
+//#define ROUND_BIASED
 
 #if mxLittleEndian
 #define IEEE_8087
