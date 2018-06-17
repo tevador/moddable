@@ -26,6 +26,8 @@
 extern txScript* fxLoadScript(txMachine* the, txString path, txUnsigned flags);
 
 #if mxWindows
+	#include <io.h>
+	#include <fcntl.h>
 	#include <direct.h>
 	#include <errno.h>
 	#include <process.h>
@@ -186,96 +188,106 @@ static txAgentCluster gxAgentCluster;
 
 int main(int argc, char* argv[]) 
 {
-	int argi;
 	int error = 0;
-	int option = 0;
-	if (argc == 1) {
-		fxPrintUsage();
-		return 0;
-	}
-	for (argi = 1; argi < argc; argi++) {
-		if (argv[argi][0] != '-')
-			continue;
-		if (!strcmp(argv[argi], "-h"))
-			fxPrintUsage();
-		else if (!strcmp(argv[argi], "-e"))
-			option = 1;
-		else if (!strcmp(argv[argi], "-m"))
-			option = 2;
-		else if (!strcmp(argv[argi], "-s"))
-			option = 3;
-		else if (!strcmp(argv[argi], "-v"))
+	int option = 0; //stdin
+	if (argc > 1) {
+		if (!strcmp(argv[1], "-e") && argc > 2) {
+			option = 1; //arg
+		} else if (!strcmp(argv[1], "-v")) {
 			printf("XS %d.%d.%d\n", XS_MAJOR_VERSION, XS_MINOR_VERSION, XS_PATCH_VERSION);
-		else {
-			fxPrintUsage();
-			return 1;
+			return 0;
+		} else {
+			option = 2; //file
 		}
 	}
-	if (option == 0)
-		error = main262(argc, argv);
-	else {
-		xsCreation _creation = {
-			128 * 1024 * 1024, 	/* initialChunkSize */
-			16 * 1024 * 1024, 	/* incrementalChunkSize */
-			8 * 1024 * 1024, 	/* initialHeapCount */
-			1 * 1024 * 1024, 	/* incrementalHeapCount */
-			4096, 				/* stackCount */
-			4096*3, 			/* keyCount */
-			1993, 				/* nameModulo */
-			127, 				/* symbolModulo */
-			32 * 1024,			/* parserBufferSize */
-			1993,				/* parserTableModulo */
-		};
-		xsCreation* creation = &_creation;
-		xsMachine* machine;
-		char path[C_PATH_MAX];
-		fxInitializeSharedCluster();
-		machine = xsCreateMachine(creation, "xsr", NULL);
-		xsBeginHost(machine);
-		{
-			xsTry {
-				fxNewHostFunctionGlobal(the, fx_clearTimer, 1, xsID("clearInterval"), XS_DONT_ENUM_FLAG);
-				the->stack++;
-				fxNewHostFunctionGlobal(the, fx_clearTimer, 1, xsID("clearTimeout"), XS_DONT_ENUM_FLAG);
-				the->stack++;
-				fxNewHostFunctionGlobal(the, fx_createRealmException, 1, xsID("createRealm"), XS_DONT_ENUM_FLAG);
-				the->stack++;
-				fxNewHostFunctionGlobal(the, fx_evalScript, 1, xsID("evalScript"), XS_DONT_ENUM_FLAG);
-				the->stack++;
-				fxNewHostFunctionGlobal(the, fx_print, 1, xsID("print"), XS_DONT_ENUM_FLAG);
-				the->stack++;
-				fxNewHostFunctionGlobal(the, fx_setInterval, 1, xsID("setInterval"), XS_DONT_ENUM_FLAG);
-				the->stack++;
-				fxNewHostFunctionGlobal(the, fx_setTimeout, 1, xsID("setTimeout"), XS_DONT_ENUM_FLAG);
-				the->stack++;
+	xsCreation _creation = {
+		128 * 1024 * 1024, 	/* initialChunkSize */
+		16 * 1024 * 1024, 	/* incrementalChunkSize */
+		8 * 1024 * 1024, 	/* initialHeapCount */
+		1 * 1024 * 1024, 	/* incrementalHeapCount */
+		4096, 				/* stackCount */
+		4096*3, 			/* keyCount */
+		1993, 				/* nameModulo */
+		127, 				/* symbolModulo */
+		32 * 1024,			/* parserBufferSize */
+		1993,				/* parserTableModulo */
+	};
+	xsCreation* creation = &_creation;
+	xsMachine* machine;
+	char path[C_PATH_MAX];
+	fxInitializeSharedCluster();
+	machine = xsCreateMachine(creation, "xsr", NULL);
+	xsBeginHost(machine);
+	{
+		xsTry {
+			//fxNewHostFunctionGlobal(the, fx_clearTimer, 1, xsID("clearInterval"), XS_DONT_ENUM_FLAG);
+			//the->stack++;
+			//fxNewHostFunctionGlobal(the, fx_clearTimer, 1, xsID("clearTimeout"), XS_DONT_ENUM_FLAG);
+			//the->stack++;
+			//fxNewHostFunctionGlobal(the, fx_createRealmException, 1, xsID("createRealm"), XS_DONT_ENUM_FLAG);
+			//the->stack++;
+			fxNewHostFunctionGlobal(the, fx_evalScript, 1, xsID("evalScript"), XS_DONT_ENUM_FLAG);
+			the->stack++;
+			fxNewHostFunctionGlobal(the, fx_print, 1, xsID("print"), XS_DONT_ENUM_FLAG);
+			the->stack++;
+			//fxNewHostFunctionGlobal(the, fx_setInterval, 1, xsID("setInterval"), XS_DONT_ENUM_FLAG);
+			//the->stack++;
+			//fxNewHostFunctionGlobal(the, fx_setTimeout, 1, xsID("setTimeout"), XS_DONT_ENUM_FLAG);
+			//the->stack++;
 
-				for (argi = 1; argi < argc; argi++) {
-					if (argv[argi][0] == '-')
-						continue;
-					if (option == 1) {
-						xsResult = xsString(argv[argi]);
-						xsCall1(xsGlobal, xsID("evalScript"), xsResult);
+			if (option == 2) {
+				if (!c_realpath(argv[1], path))
+					xsURIError("file not found: %s", argv[1]);
+				fxRunProgram(the, path, mxProgramFlag | mxDebugFlag);
+			} else if (option == 1) {
+					xsResult = xsString(argv[2]);
+					xsCall1(xsGlobal, xsID("evalScript"), xsResult);
+			}	else {
+#if mxWindows
+				setmode(fileno(stdout), O_BINARY);
+				setmode(fileno(stdin), O_BINARY);
+#endif
+				int c = 0, buffPos;
+				const size_t buffLenIncrement = 1024 * 1024;
+				size_t buffLen = 0;
+				char *sourceBuffer = NULL;
+				txStringCStream stream;
+
+				while(c != EOF) {
+					buffPos = 0;
+					while((c = fgetc(stdin)) > 0) {
+						if(buffLen < buffPos + 2) {
+							buffLen += buffLenIncrement;
+							sourceBuffer = c_realloc(sourceBuffer, sizeof(char) * buffLen);
+							if(!sourceBuffer){
+								fprintf(stderr, "Memory allocation failed (%d octets)\n", sizeof(char) * buffLen);
+								return 1;
+							}
+						}
+						sourceBuffer[buffPos++] = c;
 					}
-					else {	
-						if (!c_realpath(argv[argi], path))
-							xsURIError("file not found: %s", argv[argi]);
-						if (option == 2) 
-							fxRunModule(the, path);
-						else
-							fxRunProgram(the, path, mxProgramFlag | mxDebugFlag);
-					}
+					sourceBuffer[buffPos] = 0;
+
+					stream.buffer = sourceBuffer;
+					stream.offset = 0;
+					stream.size = buffPos;
+					fxRunScript(the, fxParseScript(the, &stream, fxStringCGetter, mxProgramFlag | mxStrictFlag), &mxGlobal, C_NULL, C_NULL, C_NULL, C_NULL);
+					mxPullSlot(mxResult);
+					fputc(0, stdout);
+					fflush(stdout);
+					//fxCollectGarbage(the);
 				}
-				fxRunLoop(the);
 			}
-			xsCatch {
-				fprintf(stderr, "%s\n", xsToString(xsException));
-				error = 1;
-			}
+			//fxRunLoop(the);
 		}
-		xsEndHost(the);
-		xsDeleteMachine(machine);
-		fxTerminateSharedCluster();
+		xsCatch {
+			fprintf(stderr, "%s\n", xsToString(xsException));
+			error = 1;
+		}
 	}
+	xsEndHost(the);
+	xsDeleteMachine(machine);
+	fxTerminateSharedCluster();
 	return error;
 }
 
