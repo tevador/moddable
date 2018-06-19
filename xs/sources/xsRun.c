@@ -2605,7 +2605,9 @@ XS_CODE_JUMP:
 			if (slot->kind == mxStack->kind) {
 				if (mxStack->kind == XS_INTEGER_KIND) {
 					#if __has_builtin(__builtin_add_overflow)
+						txInteger originalValue = slot->value.integer;
 						if (__builtin_add_overflow(slot->value.integer, mxStack->value.integer, &slot->value.integer)) {
+							slot->value.integer = originalValue;
 							fxToNumber(the, slot);
 							fxToNumber(the, mxStack);
 							slot->value.number += mxStack->value.number;
