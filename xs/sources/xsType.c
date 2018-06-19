@@ -544,10 +544,8 @@ txSlot* fxOrdinarySetProperty(txMachine* the, txSlot* instance, txID id, txIndex
 		address = &(property->next);
 	if (id) {
 		while ((property = *address)) {
-			if (property->ID == id) {
-				instance->flag &= ~XS_LEVEL_FLAG;
+			if (property->ID == id)
 				return property;
-			}
 			address = &(property->next);
 		}
 	}
