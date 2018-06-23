@@ -270,7 +270,6 @@ void fxGetNextNumberB(txParser* parser)
 void fxGetNextNumberE(txParser* parser, int parseDot)
 {
 	txString p = parser->buffer;
-	txNumber aNumber;
 	if (parser->character == '-') {
 		*p++ = (char)parser->character;
 		fxGetNextCharacter(parser);
@@ -308,13 +307,10 @@ void fxGetNextNumberE(txParser* parser, int parseDot)
 			i++;
 		}
 		if (i == 0)
-			fxReportParserError(parser, "invalid number");			
+			fxReportParserError(parser, "invalid number");
 	}
 	*p++ = 0;
-	aNumber = fxStringToNumber(parser->dtoa, parser->buffer, 1);
-	if(aNumber != aNumber) //NaN
-		fxReportParserError(parser, "invalid number");
-	fxGetNextNumber(parser, aNumber);
+	fxGetNextNumber(parser, fxStringToNumber(parser->dtoa, parser->buffer, 1));
 }
 
 void fxGetNextNumberO(txParser* parser, int c, int i)
