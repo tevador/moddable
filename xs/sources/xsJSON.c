@@ -857,7 +857,7 @@ again:
 	case XS_REFERENCE_KIND:
 		anInstance = fxGetInstance(the, aValue);
 		aValue = anInstance->next;
-		if (aValue && (aValue->flag & XS_INTERNAL_FLAG) && (aValue->kind != XS_PROXY_KIND)) {
+		if (aValue && (aValue->flag & XS_INTERNAL_FLAG) && (aValue->kind != XS_PROXY_KIND) && (aValue->kind != XS_ERROR_KIND)) {
 			goto again;
 		}
 		fxStringifyJSONName(the, theStringifier, theFlag);
