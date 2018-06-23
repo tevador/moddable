@@ -310,6 +310,9 @@ void fxGetNextNumberE(txParser* parser, int parseDot)
 			fxReportParserError(parser, "invalid number");
 	}
 	*p++ = 0;
+	if(fxIsIdentifierFirst((char)parser->character)) {
+		fxReportParserError(parser, "IdentifierStart must not immediately follow a NumericLiteral");
+	}
 	fxGetNextNumber(parser, fxStringToNumber(parser->dtoa, parser->buffer, 1));
 }
 
