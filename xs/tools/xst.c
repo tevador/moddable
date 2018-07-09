@@ -266,6 +266,9 @@ int main(int argc, char* argv[])
 						}
 						sourceBuffer[buffPos++] = c;
 					}
+					if(sourceBuffer == NULL)
+						return 0;
+
 					sourceBuffer[buffPos] = 0;
 
 					stream.buffer = sourceBuffer;
