@@ -827,39 +827,3 @@ void modMachineTaskUninit(xsMachine *the)
 		msg = msg->next;
 	}
 }
-
-
-
-
-#if MY_MALLOC
-char synergyDebugStr[256];
-void *my_calloc(size_t nitems, size_t size) {
-	void *ret;
-	ret = calloc(nitems, size);
-	if (NULL == ret) {
-		sprintf(synergyDebugStr, "# calloc failed %ld\n", size);
-	}
-	return ret;
-}
-
-void *my_realloc(void *ptr, size_t size) {
-	void *ret;
-	ret = realloc(ptr, size);
-	if (NULL == ret) {
-		sprintf(synergyDebugStr, "# realloc failed %ld\n", size);
-	}
-	return ret;
-}
-
-void *my_malloc(size_t size) {
-	void *ret;
-	ret = malloc(size);
-	if (NULL == ret) {
-		sprintf(synergyDebugStr, "# malloc failed %ld\n", size);
-	}
-	return ret;
-}
-#endif
-
-
-

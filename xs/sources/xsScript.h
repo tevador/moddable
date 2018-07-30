@@ -547,15 +547,21 @@ struct sxParserJump {
 	txParserJump* nextJump;
 };
 
+#define PARSER_SYMBOL_MODULO 401
+
 struct sxParser {
-	txParserChunk* first;
+	size_t chunkMemUsed;
+	size_t chunkMemSize;
+	char* chunkMem;
+
 	txParserJump* firstJump;
 	void* console;
 	int error;
 	
 	void* dtoa;
 	
-	txSize symbolModulo;
+	// Set at compile time
+	//txSize symbolModulo;
 	txSymbol** symbolTable;
 	
 	txID hostNodeIndex;
@@ -672,7 +678,9 @@ struct sxParser {
 	
 	char* buffer;
 	txSize bufferSize;
+#ifdef mxInstrument
 	txSize total;
+#endif
 };
 
 enum {
@@ -891,7 +899,6 @@ extern void fxReportParserWarning(txParser* parser, txString theFormat, ...);
 extern void fxReportLineReferenceError(txParser* parser, txInteger line, txString theFormat, ...);
 extern void fxReportLineError(txParser* parser, txInteger line, txString theFormat, ...);
 extern void fxTerminateParser(txParser* parser);
-extern void fxThrowMemoryError(txParser* parser);
 extern void fxThrowParserError(txParser* parser, txInteger count);
 
 /* xsLexical.c */

@@ -210,7 +210,7 @@ int main(int argc, char* argv[])
 		1993, 				/* nameModulo */
 		127, 				/* symbolModulo */
 		32 * 1024,			/* parserBufferSize */
-		1993,				/* parserTableModulo */
+		PARSER_SYMBOL_MODULO,		/* parserTableModulo */
 	};
 	xsCreation* creation = &_creation;
 	xsMachine* machine;
@@ -253,27 +253,29 @@ int main(int argc, char* argv[])
 				char *sourceBuffer = NULL;
 				txStringCStream stream;
 
-				while(c != EOF) {
+				for (;;) {
 					buffPos = 0;
-					while((c = fgetc(stdin)) > 0) {
-						if(buffLen < buffPos + 2) {
-							buffLen += buffLenIncrement;
-							sourceBuffer = c_realloc(sourceBuffer, sizeof(char) * buffLen);
-							if(!sourceBuffer){
-								fprintf(stderr, "Memory allocation failed (%d octets)\n", sizeof(char) * buffLen);
-								return 1;
-							}
+					char lengthBuffer[32];
+					for (;;) {
+						c = fgetc(stdin);
+						if ((c == '\n') || (c == EOF)) {
+							break;
 						}
-						sourceBuffer[buffPos++] = c;
+						lengthBuffer[buffPos++] = c;
+						if (buffPos >= 32) DEBUG_BREAK;
 					}
-					if(sourceBuffer == NULL)
-						return 0;
-
-					sourceBuffer[buffPos] = 0;
+					if (c == EOF) {
+						break;
+					}
+					lengthBuffer[buffPos] = '\0';
+					const int sourceLen = atoi(lengthBuffer);
+					sourceBuffer = c_realloc(sourceBuffer, sizeof(char) * (sourceLen + 1));
+					fread(sourceBuffer, 1, sourceLen, stdin);
+					sourceBuffer[sourceLen] = 0;
 
 					stream.buffer = sourceBuffer;
 					stream.offset = 0;
-					stream.size = buffPos;
+					stream.size = sourceLen;
 					fxRunScript(the, fxParseScript(the, &stream, fxStringCGetter, mxProgramFlag | mxStrictFlag), &mxGlobal, C_NULL, C_NULL, C_NULL, C_NULL);
 					mxPullSlot(mxResult);
 					fputc(0, stdout);
@@ -726,7 +728,7 @@ int fxRunTestCase(txContext* context, char* path, txUnsigned flags, char* messag
 		1993, 				/* nameModulo */
 		127,				/* symbolModulo */
 		32 * 1024,			/* parserBufferSize */
-		1993,				/* parserTableModulo */
+		PARSER_SYMBOL_MODULO,		/* parserTableModulo */
 	};
 	xsCreation* creation = &_creation;
 	xsMachine* machine;
@@ -976,7 +978,7 @@ void* fx_agent_start_aux(void* it)
 		1993, 				/* nameModulo */
 		127, 				/* symbolModulo */
 		32 * 1024,			/* parserBufferSize */
-		1993,				/* parserTableModulo */
+		PARSER_SYMBOL_MODULO,		/* parserTableModulo */
 	};
 	txAgent* agent = it;
 	xsMachine* machine = xsCreateMachine(&creation, "xst-agent", NULL);

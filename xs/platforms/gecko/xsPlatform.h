@@ -40,6 +40,11 @@
 
 #include "stdint.h"
 
+extern void* my_malloc(size_t size);
+extern void my_free(void* ptr);
+extern void *my_realloc(void *ptr, size_t new_size);
+extern void* my_calloc(size_t num, size_t size);
+
 #define mxRegExp 1
 //#define mxReport 1
 #define mxNoFunctionLength 1
@@ -115,22 +120,11 @@ typedef va_list c_va_list;
 #define c_va_end va_end
 #define c_va_start va_start
 
-#define MY_MALLOC 0
-#if MY_MALLOC
-extern void *my_calloc(size_t nitems, size_t size);	
-extern void *my_realloc(void *ptr, size_t size);	
-extern void *my_malloc(size_t size);	
 #define c_calloc my_calloc
 #define c_malloc my_malloc
 #define c_realloc my_realloc
-#else
-#define c_calloc calloc
-#define c_malloc malloc
-#define c_realloc realloc
-#endif
-
 #define c_exit exit
-#define c_free free
+#define c_free my_free
 #define c_qsort qsort
 #define c_strtod strtod
 #define c_strtol strtol

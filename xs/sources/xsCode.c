@@ -489,7 +489,7 @@ txScript* fxParserCode(txParser* parser)
 	}
 	
 	address = parser->symbolTable;
-	c = parser->symbolModulo;
+	c = /*parser->symbolModulo*/PARSER_SYMBOL_MODULO;
 	id = 0;
 	total = 2;
 	for (i = 0; i < c; i++) {
@@ -865,7 +865,7 @@ txScript* fxParserCode(txParser* parser)
 	mxEncode2(p, id);
 	
 	address = parser->symbolTable;
-	c = parser->symbolModulo;
+	c = /*parser->symbolModulo*/PARSER_SYMBOL_MODULO;
 	for (i = 0; i < c; i++) {
 		txSymbol* symbol = *address;
 		while (symbol) {

@@ -38,6 +38,23 @@
 #ifndef __XSPLATFORM__
 #define __XSPLATFORM__
 
+#include <stddef.h>
+
+extern void* my_malloc(size_t size);
+extern void my_free(void* ptr);
+extern void *my_realloc(void *ptr, size_t new_size);
+extern void* my_calloc(size_t num, size_t size);
+
+#ifdef _MSC_VER
+
+#define DEBUG_BREAK __debugbreak()
+
+#else // _MSC_VER
+
+#define DEBUG_BREAK __builtin_trap()
+
+#endif // _MSC_VER
+
 #define mxBigEndian 0
 #define mxLittleEndian 1
 
@@ -215,28 +232,28 @@
 #endif
 
 #ifndef c_calloc
-	#define c_calloc calloc
+	#define c_calloc my_calloc
 #endif
 #ifndef c_exit
 	#define c_exit exit
 #endif
 #ifndef c_free
-	#define c_free free
+	#define c_free my_free
 #endif
 #ifndef c_malloc
-	#define c_malloc malloc
+	#define c_malloc my_malloc
 #endif
 #ifndef c_free_uint32
-	#define c_free_uint32 free
+	#define c_free_uint32 my_free
 #endif
 #ifndef c_malloc_uint32
-	#define c_malloc_uint32 malloc
+	#define c_malloc_uint32 my_malloc
 #endif
 #ifndef c_qsort
 	#define c_qsort qsort
 #endif
 #ifndef c_realloc
-	#define c_realloc realloc
+	#define c_realloc my_realloc
 #endif
 #ifndef c_strtod
 	#define c_strtod strtod

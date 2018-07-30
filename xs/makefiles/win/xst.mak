@@ -45,7 +45,6 @@ C_OPTIONS = \
 	/D YAML_DECLARE_STATIC \
 	/D INCLUDE_XSPLATFORM \
 	/D XSPLATFORM=\"xst.h\" \
-	/D mxDebug=1 \
 	/D mxNoConsole=1 \
 	/D mxParse=1 \
 	/D mxRun=1 \
@@ -70,18 +69,24 @@ C_OPTIONS = $(C_OPTIONS) \
 	/D NDEBUG \
 	/Fp$(TMP_DIR_RLS)\ \
 	/O2 \
+	/Ob2 \
+	/Oi \
+	/Ot \
+	/Oy \
+	/sdl- \
+	/GL \
+	/GS- \
+	/Z7 \
 	/W0
 !ENDIF
 
 LIBRARIES = ws2_32.lib advapi32.lib comctl32.lib comdlg32.lib gdi32.lib kernel32.lib user32.lib
 	
-LINK_OPTIONS = /incremental:no /machine:X64 /nologo /subsystem:console
-!IF "$(GOAL)"=="debug"
-LINK_OPTIONS = $(LINK_OPTIONS) /debug
-!ENDIF
+LINK_OPTIONS = /LTCG /DEBUG:FULL /incremental:no /machine:X64 /nologo /subsystem:console
 
 OBJECTS = \
 	$(TMP_DIR)\xsAll.o \
+	$(TMP_DIR)\xsAllocator.o \
 	$(TMP_DIR)\xsAPI.o \
 	$(TMP_DIR)\xsArray.o \
 	$(TMP_DIR)\xsAtomics.o \

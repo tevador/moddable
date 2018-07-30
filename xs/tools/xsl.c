@@ -95,7 +95,7 @@ int main(int argc, char* argv[])
 		1993,				/* nameModulo */
 		127,				/* symbolModulo */
 		32 * 1024,			/* parserBufferSize */
-		1993,				/* parserTableModulo */
+		PARSER_SYMBOL_MODULO,		/* parserTableModulo */
 	};
 	xsCreation* creation = &_creation;
 	xsMachine* the = NULL;

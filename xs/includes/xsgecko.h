@@ -23,11 +23,15 @@
 #include "mc.defines.h"
 #include <stdint.h>
 #include <stddef.h>
-#include "malloc.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+extern void* my_malloc(size_t size);
+extern void my_free(void* ptr);
+extern void *my_realloc(void *ptr, size_t new_size);
+extern void* my_calloc(size_t num, size_t size);
 
 #define sint8_t int8_t
 #define sint16_t int16_t
@@ -240,9 +244,10 @@ extern uint32_t gMsgBufferMax;
 /*
 	c libraries
 */
-#define c_calloc calloc
-#define c_free free
-#define c_malloc malloc
+#define c_calloc my_calloc
+#define c_free my_free
+#define c_malloc my_malloc
+#define c_realloc my_realloc
 
 /* STRING */
 #define c_memmove memmove

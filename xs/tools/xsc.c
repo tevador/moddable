@@ -268,7 +268,7 @@ int main(int argc, char* argv[])
 	txBoolean binary = 0;
 	txSize length;
 
-	fxInitializeParser(parser, C_NULL, 32*1024, 1993);
+	fxInitializeParser(parser, C_NULL, 32*1024, PARSER_SYMBOL_MODULO);
 	parser->firstJump = &jump;
 	if (c_setjmp(jump.jmp_buf) == 0) {
 		for (argi = 1; argi < argc; argi++) {
