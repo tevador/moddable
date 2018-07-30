@@ -466,7 +466,11 @@ void fx_Atomics_xor(txMachine* the)
 	#define mxUnlockMutex(MUTEX) pthread_mutex_unlock(MUTEX)
 	#define mxWakeCondition(CONDITION) pthread_cond_signal(CONDITION)
 #elif mxWindows
-	#define mxThreads 1
+	#define mxThreads 0
+	typedef void* txThread;
+	#define mxCurrentThread() C_NULL
+
+	/*#define mxThreads 1
 	typedef CONDITION_VARIABLE txCondition;
 	typedef CRITICAL_SECTION txMutex;
 	typedef DWORD txThread;
@@ -478,7 +482,7 @@ void fx_Atomics_xor(txMachine* the)
 	#define mxLockMutex(MUTEX) EnterCriticalSection(MUTEX)
 	#define mxSleepCondition(CONDITION,MUTEX) SleepConditionVariableCS(CONDITION,MUTEX,INFINITE)
 	#define mxUnlockMutex(MUTEX) LeaveCriticalSection(MUTEX)
-	#define mxWakeCondition(CONDITION) WakeConditionVariable(CONDITION)
+	#define mxWakeCondition(CONDITION) WakeConditionVariable(CONDITION)*/
 #else
 	#define mxThreads 0
 	typedef void* txThread;

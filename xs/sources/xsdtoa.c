@@ -313,17 +313,17 @@ extern "C" {
 #ifdef MALLOC
 extern void *MALLOC(size_t, void*);
 #else
-#define MALLOC malloc
+#define MALLOC my_malloc
 #endif
 
 #ifdef REALLOC
 extern void *REALLOC(void*,size_t);
 #else
-#define REALLOC realloc
+#define REALLOC my_realloc
 #endif
 
 #ifndef FREE
-#define FREE free
+#define FREE my_free
 #endif
 
 #ifdef __cplusplus

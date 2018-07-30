@@ -39,26 +39,29 @@
 
 void fxDisposeParserChunks(txParser* parser)
 {
-	txParserChunk* block = parser->first;
-	while (block) {
-		txParserChunk* next = block->next;
-		c_free(block);
-		block = next;
-	}
+	c_free(parser->chunkMem);
+
+	parser->chunkMemUsed = 0;
+	parser->chunkMemSize = 0;
+	parser->chunkMem = NULL;
 }
 
-void fxInitializeParser(txParser* parser, void* console, txSize bufferSize, txSize symbolModulo)
+void fxInitializeParser(txParser* parser, void* console, txSize bufferSize, txSize symbolModulo_unused)
 {
 	c_memset(parser, 0, sizeof(txParser));
-	parser->first = C_NULL;
+
+	parser->chunkMemUsed = 0;
+	parser->chunkMemSize = 16777216;
+	parser->chunkMem = c_malloc(parser->chunkMemSize);
+
 	parser->console = console;
 
 	parser->buffer = fxNewParserChunk(parser, bufferSize);
 	parser->bufferSize = bufferSize;
 	
 	parser->dtoa = fxNew_dtoa(NULL);
-	parser->symbolModulo = symbolModulo;
-	parser->symbolTable = fxNewParserChunkClear(parser, parser->symbolModulo * sizeof(txSymbol*));
+	//parser->symbolModulo = symbolModulo;
+	parser->symbolTable = fxNewParserChunkClear(parser, /*parser->symbolModulo*/PARSER_SYMBOL_MODULO * sizeof(txSymbol*));
 
 	parser->emptyString = fxNewParserString(parser, "", 0);
 
@@ -121,13 +124,16 @@ void fxInitializeParser(txParser* parser, void* console, txSize bufferSize, txSi
 
 void* fxNewParserChunk(txParser* parser, txSize size)
 {
-	txParserChunk* block = c_malloc(sizeof(txParserChunk) + size);
-	if (!block)
-		fxThrowMemoryError(parser);
-	parser->total += sizeof(txParserChunk) + size;
-	block->next = parser->first;
-	parser->first = block;
-	return block + 1;
+#ifdef mxInstrument
+	parser->total += size;
+#endif
+	void* ptr = parser->chunkMem + parser->chunkMemUsed;
+	parser->chunkMemUsed += size;
+	if (parser->chunkMemUsed > parser->chunkMemSize)
+	{
+		DEBUG_BREAK;
+	}
+	return ptr;
 }
 
 void* fxNewParserChunkClear(txParser* parser, txSize size)
@@ -161,12 +167,13 @@ txSymbol* fxNewParserSymbol(txParser* parser, txString theString)
 		aSum = (aSum << 1) + *aString++;
 	}
 	aSum &= 0x7FFFFFFF;
-	aModulo = aSum % parser->symbolModulo;
+	aModulo = aSum % /*parser->symbolModulo*/PARSER_SYMBOL_MODULO;
 	aSymbol = parser->symbolTable[aModulo];
 	while (aSymbol != C_NULL) {
 		if (aSymbol->sum == aSum)
-			if (c_strcmp(aSymbol->string, theString) == 0)
-				break;
+			if (aSymbol->length == aLength + 1)
+				if (c_memcmp(aSymbol->string, theString, aSymbol->length) == 0)
+					break;
 		aSymbol = aSymbol->next;
 	}
 	if (aSymbol == C_NULL) {
@@ -256,12 +263,6 @@ void fxTerminateParser(txParser* parser)
 	fxDisposeParserChunks(parser);
 	if (parser->dtoa)
 		fxDelete_dtoa(parser->dtoa);
-}
-
-void fxThrowMemoryError(txParser* parser)
-{
-	parser->error = C_ENOMEM;
-	c_longjmp(parser->firstJump->jmp_buf, 1);
 }
 
 void fxThrowParserError(txParser* parser, txInteger count)

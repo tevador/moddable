@@ -28,7 +28,6 @@
 #include "stdio.h"
 #include "stdlib.h"
 #include "errno.h"
-#include "malloc.h"
 #include "setjmp.h"
 #include "string.h"
 
@@ -66,6 +65,11 @@ extern "C" {
 /*
 	memory and strings
 */
+
+extern void* my_malloc(size_t size);
+extern void my_free(void* ptr);
+extern void *my_realloc(void *ptr, size_t new_size);
+extern void* my_calloc(size_t num, size_t size);
 
 extern uint8_t espRead8(const void *addr);
 extern uint16_t espRead16(const void *addr);
@@ -313,17 +317,19 @@ typedef va_list c_va_list;
 	#define c_fprintf(FILE, ...) tfp_printf( __VA_ARGS__)
 #endif
 
-#define c_calloc calloc
+#include "xsAllocator.h"
+
+#define c_calloc my_calloc
 #if ESP32
 	#define c_exit(n) esp_restart()
 #else
 	#define c_exit(n) system_restart()
 #endif
-#define c_free free
-#define c_malloc malloc
+#define c_free my_free
+#define c_malloc my_malloc
 void selectionSort(void *base, size_t num, size_t width, int (*compare )(const void *, const void *));
 #define c_qsort selectionSort
-#define c_realloc realloc
+#define c_realloc my_realloc
 #define c_strtod strtod
 #define c_strtol strtol
 #define c_strtoul strtoul
